@@ -1,0 +1,10 @@
+# Login Credentials
+SERVER = 'https://chat.somewhere.com'
+BOTNAME = 'botname'
+PASSWORD = 'supersecurepassword'
+
+# Poll Settings
+POLL_STATUS_ROOM = ''
+
+# Sentry Settings
+SENTRY_URL = None

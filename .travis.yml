@@ -1,0 +1,51 @@
+dist: xenial
+
+language: python
+
+python: "3.7"
+
+services:
+  - docker
+
+install:
+  - make update
+
+jobs:
+  include:
+    # First stage
+    - stage: "Basic Tests"
+      name: "Unittest"
+      script: make utest
+    - name: "Typecheck"
+      script: make mypy
+    - name: "Lint"
+      script: make lint
+    - name: "Check import"
+      script: make verify_import
+    # Second stage
+    - stage: "Integration Tests"
+      script:
+        # fail fast - in case there is an error building, quit immediately.
+        # instruct bash to quit if there is a non zero response code (error)
+        # https://github.com/travis-ci/travis-ci/issues/1066
+        - set -e
+        - docker version
+        - docker-compose -f docker-compose-testserver.yml up -d
+        - docker ps
+        - until curl http://localhost:3000/api/v1/info; do sleep 5; echo "waiting for Rocket.Chat server to start"; done
+        - make test_cov
+        # back to default in case internal travis scripts return non zero response codes.
+        - set +e
+    - stage: "Deployment"
+      install: skip
+      script: skip
+      deploy:
+        provider: pypi
+        on:
+          tags: true
+          branch:
+            - master
+            - /v?(\d+\.)?(\d+\.)?(\*|\d+)$/
+        # Your pypi username
+        user: smoehrle
+        password : ${PYPI_PASSWORD}

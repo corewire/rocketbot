@@ -1,0 +1,17 @@
+# Login credentials and settings for the bot
+bot_config.py
+
+# Python
+**/__pycache__
+*.egg-info
+.pytest_cache/
+.coverage
+dist
+build
+.eggs
+
+# VS Code
+.vscode
+.mypy_cache
+venv
+.idea
