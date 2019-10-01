@@ -31,6 +31,11 @@ class Attachment:
     image_type: Optional[str] = None
     image_size: Optional[str] = None
 
+    # Video attachment
+    video_size: Optional[str] = None
+    video_type: Optional[str] = None
+    video_url: Optional[str] = None
+
     def __post_init__(self) -> None:
         self.ts = m.create(m.RcDatetime, self.ts)
         if len(self.attachments) != 0:
