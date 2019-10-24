@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import asyncio
 import collections
 import dataclasses
 import datetime
 import json
+import logging
 import re
 import shlex
 from typing import Any, Dict, List, Optional, Set
@@ -14,6 +16,8 @@ import rocketbot.bots as bots
 import rocketbot.exception as exp
 import rocketbot.models as m
 from rocketbot.master import Master
+
+logger = logging.getLogger(__name__)
 
 
 class PollCache:
@@ -158,6 +162,7 @@ class PollManager:
             self.roomBot.rooms.add(room.name)
 
         self.polls.add(poll)
+        logger.debug(f"Poll created (id: {id}, title: {title})")
 
     async def push(self, poll: Poll, roomid: str) -> None:
         """Resend an active poll
@@ -170,6 +175,8 @@ class PollManager:
 
     async def _poll_callback(self, message: m.Message) -> None:
         msg_id = message.id
+        logger.debug(f"Poll callback")
+
         if msg_id in self.polls.by_original_msg_id:
             if not message.msg:
                 poll = self.polls.remove(original_msg_id=msg_id)
@@ -194,6 +201,7 @@ class PollManager:
         if not message.edited_by or message.edited_by.username == self.botname:
             return
 
+        logger.debug(f"Status callback")
         poll: Optional[Poll]
         if message.msg:
             try:
@@ -399,6 +407,7 @@ class Poll:
             raise exp.RocketBotPollException('Missing status message')
 
         msg = await self.to_message(master)
+        await asyncio.sleep(1)
         await master.ddp.update_message({'_id': self.poll_msg_id, 'msg': msg, 'reactions': self._get_reactions()})
         await master.ddp.update_message({'_id': self.status_msg_id, 'msg': _serialize_poll(self)})
 
@@ -432,6 +441,8 @@ class Poll:
             missing = [u for u in prev_users if u not in new_users]
             new = [u for u in new_users if u not in prev_users]
             if missing or new:
+                logger.debug(f"New reactions for {option.emoji}: {new}, Missing reactions: {missing}")
+
                 update = True
                 for u in missing:
                     option.users.remove(u)
@@ -444,6 +455,7 @@ class Poll:
             missing = [u for u in prev_users if u not in new_users]
             new = [u for u in new_users if u not in prev_users]
             if missing or new:
+                logger.debug(f"New reactions for {option.emoji}: {new}, Missing reactions: {missing}")
                 update = True
                 for u in missing:
                     option.users.remove(u)
