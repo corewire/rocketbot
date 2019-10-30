@@ -9,7 +9,7 @@ push: update utest mypy lint verify_import itest _check_modified
 	git push
 
 update:
-	python setup.py install
+	python setup.py develop
 	pip install -r requirements.dev.txt
 
 test: utest itest
