@@ -150,7 +150,7 @@ class PollManager:
                 pollmanager.roomBot.rooms.add(room['room']['name'])
         return pollmanager
 
-    async def create(self, roomid: str, msg_id: str, title: str, options: List[str]) -> None:
+    async def create(self, roomid: str, msg_id: str, title: str, options: List[str]) -> Poll:
         id = self.polls.new_id()
         poll = Poll(
             botname=self.botname, original_msg_id=msg_id,
@@ -163,6 +163,7 @@ class PollManager:
 
         self.polls.add(poll)
         logger.debug(f"Poll created (id: {id}, title: {title})")
+        return poll
 
     async def push(self, poll: Poll, roomid: str) -> None:
         """Resend an active poll
