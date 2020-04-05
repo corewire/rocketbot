@@ -241,10 +241,10 @@ def _replace_quotes(string: str) -> str:
 LETTER_EMOJIS = [f':regional_indicator_{c}:' for c in 'abcdefghijklmnopqrstuvwxyz']
 
 NUMBER_EMOJI_TO_VALUE = {
-    ':x1:': 1,
-    ':x2:': 2,
-    ':x3:': 3,
-    ':x4:': 4,
+    ':one:': 1,
+    ':two:': 2,
+    ':three:': 3,
+    ':four:': 4,
 }
 
 VALUE_TO_NUMBER_EMOJI = {val: key for key, val in NUMBER_EMOJI_TO_VALUE.items()}
