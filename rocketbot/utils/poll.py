@@ -376,7 +376,9 @@ class Poll:
             poll_msg = await master.ddp.send_message(roomid, msg)
             self.poll_msg_id = poll_msg.id
             self.roomid = roomid
-            await master.ddp.update_message({'_id': self.poll_msg_id, 'reactions': reactions})
+
+            for reaction in reactions.keys():
+                await master.ddp.set_reaction(reaction, self.poll_msg_id, True)
         except exp.RocketClientException as e:
             raise exp.RocketBotPollException('Could not send poll message/reactions') from e
 
@@ -409,7 +411,7 @@ class Poll:
 
         msg = await self.to_message(master)
         await asyncio.sleep(1)
-        await master.ddp.update_message({'_id': self.poll_msg_id, 'msg': msg, 'reactions': self._get_reactions()})
+        await master.ddp.update_message({'_id': self.poll_msg_id, 'msg': msg})
         await master.ddp.update_message({'_id': self.status_msg_id, 'msg': _serialize_poll(self)})
 
     def _get_reactions(self) -> Dict[str, Dict[str, Any]]:
